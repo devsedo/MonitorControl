@@ -8,6 +8,7 @@ class OtherDisplay: Display {
   var ddc: IntelDDC?
   var arm64ddc: Bool = false
   var arm64avService: IOAVService?
+  var arm64avServiceChipAddress: UInt32 = .init(ARM64_DDC_7BIT_ADDRESS)
   var isDiscouraged: Bool = false
   let writeDDCQueue = DispatchQueue(label: "Local write DDC queue")
   var writeDDCNextValue: [Command: UInt16] = [:]
@@ -410,7 +411,7 @@ class OtherDisplay: Display {
     for controlCode in controlCodes {
       if Arm64DDC.isArm64 {
         if self.arm64ddc {
-          _ = Arm64DDC.write(service: self.arm64avService, command: controlCode, value: value)
+          _ = Arm64DDC.write(service: self.arm64avService, command: controlCode, value: value, chipAddress: self.arm64avServiceChipAddress)
         }
       } else {
         _ = self.ddc?.write(command: controlCode, value: value, errorRecoveryWaitTime: 2000) ?? false
@@ -431,9 +432,9 @@ class OtherDisplay: Display {
       }
       DisplayManager.shared.globalDDCQueue.sync {
         if let unwrappedDelay = delay {
-          values = Arm64DDC.read(service: self.arm64avService, command: controlCode, readSleepTime: UInt32(unwrappedDelay / 1000), numOfRetryAttemps: UInt8(min(tries, 255)))
+          values = Arm64DDC.read(service: self.arm64avService, command: controlCode, readSleepTime: UInt32(unwrappedDelay / 1000), numOfRetryAttemps: UInt8(min(tries, 255)), chipAddress: self.arm64avServiceChipAddress)
         } else {
-          values = Arm64DDC.read(service: self.arm64avService, command: controlCode, numOfRetryAttemps: UInt8(min(tries, 255)))
+          values = Arm64DDC.read(service: self.arm64avService, command: controlCode, numOfRetryAttemps: UInt8(min(tries, 255)), chipAddress: self.arm64avServiceChipAddress)
         }
       }
     } else {

@@ -343,6 +343,7 @@ class DisplayManager {
       for serviceMatch in Arm64DDC.getServiceMatches(displayIDs: displayIDs) {
         for otherDisplay in self.getOtherDisplays() where otherDisplay.identifier == serviceMatch.displayID && serviceMatch.service != nil {
           otherDisplay.arm64avService = serviceMatch.service
+          otherDisplay.arm64avServiceChipAddress = serviceMatch.chipAddress
           os_log("Display service match successful for display %{public}@", type: .info, String(serviceMatch.displayID))
           if serviceMatch.discouraged {
             os_log("Display %{public}@ is flagged as discouraged by Arm64DDC.", type: .info, String(serviceMatch.displayID))
